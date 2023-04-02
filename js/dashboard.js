@@ -11,6 +11,7 @@ const modalEdit = new bootstrap.Modal("#modal-edit")
 const divNotes = document.getElementById("notes")
 const titleUpdate = document.getElementById('title-updated')
 const descriptionUpdate = document.getElementById('description-updated')
+let idUpdate = -1
 
 const btnLogout = document.getElementById('btn-logout')
 
@@ -49,12 +50,42 @@ formCreateNote.addEventListener('submit',(e)=>{
    changeHeader()
 })
 
+//Função para editar tarefa
+formUpdateNote.addEventListener('submit', (e)=>{
+    e.preventDefault()
+
+    if(!formUpdateNote.checkValidity()){
+        formUpdateNote.classList.add("was-validated");
+        return;
+    }
+
+    const indexUpdate = loggedUser.notes.findIndex((note)=> note.id === idUpdate)
+
+    loggedUser.notes[indexUpdate].title = titleUpdate.value
+    loggedUser.notes[indexUpdate.description] = descriptionUpdate.value
+    
+    const cardTitle = document.querySelector(`#note-${idUpdate} .card-header`)
+    cardTitle.innerText = titleUpdate.value
+
+    const cardDescription =document.querySelector(`#note-${idUpdate} .card-text`)
+    cardDescription.innerText = descriptionUpdate.value
+
+    updateLocalStorage()
+    formUpdateNote.reset()
+    idUpdate= -1
+    formUpdateNote.classList.remove('was-validated')
+    modalEdit.hide()
+    showAlert("success", "Tarefa atualizada com sucesso! ✅ ")
+})
+
+//Função para sair
 btnLogout.addEventListener('click', ()=>{
     localStorage.removeItem("loggedUser");
 
     window.location.href = "./index.html"
 })
 
+//Função para criar cards
 function createCard(note){
     const col = document.createElement('div')
     col.setAttribute('class', 'col-12 col-sm-6 col-lg-4 col-xl-3')
@@ -90,10 +121,7 @@ function createCard(note){
         titleUpdate.value = note.title
         descriptionUpdate.value = note.description
 
-        formUpdateNote.addEventListener('submit', (e)=>{
-            e.preventDefault()
-            editNote(note)
-        })
+        idUpdate = note.id
     })
 
     const btnDel = document.createElement('button')
@@ -120,28 +148,7 @@ function createCard(note){
     divNotes.appendChild(col)
 }
 
-function editNote(note){
-    
-    if(!formUpdateNote.checkValidity()){
-        formUpdateNote.classList.add("was-validated");
-        return;
-    }
-
-    note.title = titleUpdate.value
-    note.description = descriptionUpdate.value
-    
-    const cardTitle = document.querySelector(`#note-${note.id} .card-header`)
-    cardTitle.innerText = titleUpdate.value
-
-    const cardDescription =document.querySelector(`#note-${note.id} .card-text`)
-    cardDescription.innerText = descriptionUpdate.value
-
-    updateLocalStorage()
-    formUpdateNote.reset()
-    formUpdateNote.classList.remove('was-validated')
-    modalEdit.hide()
-}
-
+//Função para deletar tarefa
 function deleteNote(id){
    const index = loggedUser.notes.findIndex((note) => note.id === id)
    loggedUser.notes.splice(index, 1)
@@ -152,8 +159,10 @@ function deleteNote(id){
 
    changeHeader()
    updateLocalStorage()
+   showAlert("success", "tarefa deletada com sucesso! ✅")
 }
 
+//função para adicionar data de criação
 function createdAt(){
     const date = new Date()
     let day = date.getDate()
@@ -163,6 +172,7 @@ function createdAt(){
     return `${day}/${month}/${year}`
 }
 
+//função para mudar a header
 function changeHeader(){
     const title = document.getElementById('title')
     const p = document.getElementById('totalRecados')
@@ -171,6 +181,42 @@ function changeHeader(){
     p.innerText = `Total de tarefas: ${loggedUser.notes.length}`
 }
 
+//função para mostrar alerta
+function showAlert(mode, message){
+    const divToast = document.getElementById('toast')
+
+    const toast = document.createElement('div')
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', "assertive")
+    toast.setAttribute('aria-atomic', 'true');
+    toast.setAttribute('class', 'bounce-top toast align-items-center mx-1 mt-2 border-0 show')
+    toast.classList.add(`text-bg-${mode}`)
+  
+    const content = document.createElement('div');
+    content.classList.add('d-flex')
+  
+    const toastBody = document.createElement('div');
+    toastBody.classList.add('toast-body');
+    toastBody.innerText = `${message}`
+  
+    const btn = document.createElement('button')
+    btn.setAttribute('type', 'button')
+    btn.setAttribute('class', 'btn-close btn-close-white me-2 m-auto')
+    btn.setAttribute('data-bs-dismiss', 'toast')
+    btn.setAttribute('aria-label', 'Close')
+  
+    content.appendChild(toastBody)
+    content.appendChild(btn)
+    toast.appendChild(content)
+  
+    divToast.appendChild(toast)
+  
+    setTimeout(()=>{
+      toast.remove()
+    }, 6000)
+}
+
+//função para atualizar local storage
 function updateLocalStorage(){
     let index = users.findIndex((user)=> user.email === loggedUser.email)
     users.splice(index,1,loggedUser)

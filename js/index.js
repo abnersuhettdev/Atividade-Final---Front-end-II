@@ -165,7 +165,7 @@ function showAlert(mode, message){
     toast.setAttribute('role', 'alert');
     toast.setAttribute('aria-live', "assertive")
     toast.setAttribute('aria-atomic', 'true');
-    toast.setAttribute('class', 'toast align-items-center position-absolute top-0 end-0 m-2 me-2 border-0 show')
+    toast.setAttribute('class', 'bounce-top toast align-items-center position-absolute top-0 end-0 m-2 me-2 border-0 show')
     toast.classList.add(`text-bg-${mode}`)
   
     const content = document.createElement('div');
