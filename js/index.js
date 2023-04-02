@@ -136,7 +136,7 @@ formLogin.addEventListener('submit', (e)=>{
     }
 
     localStorage.setItem("loggedUser", JSON.stringify(loggedUser))
-    window.location.href = '/dashboard.html'
+    window.location.href = './dashboard.html'
 })
 
 //verifica o usuário
