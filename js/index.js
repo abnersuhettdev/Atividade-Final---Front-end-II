@@ -132,6 +132,7 @@ formLogin.addEventListener('submit', (e)=>{
     const loggedUser = verifyUser()
 
     if(!loggedUser){
+        showAlert("danger", 'Login não autorizado.❌ ')
         return
     }
 
